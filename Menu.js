@@ -1,24 +1,26 @@
-import promptSync from 'prompt-sync';t
+import promptSync from 'prompt-sync';
+
+
+const prompt = promptSync();
 
 import {
   afficherTableauDeBord,
   afficherApprenants,
   creerApprenant,
-  rechercherParId,
-  ajouterModifierResultat,
-  rechercherParNom,
-  filtrerParNiveau,
-  trierParProgression,
-  trierParNom
+  rechercherParId
+//   ajouterModifierResultat,
+//   rechercherParNom,
+//   filtrerParNiveau,
+//   trierParProgression,
+//   trierParNom
 } from './index.js';
 
-const prompt = promptSync();
+
 
 export function afficherMenu() {
-  let choix = "";
-
- while (choix !== "0") {
-
+    
+    while (true) {
+        
     console.log("\n==========================================");
     console.log("           SAS PROGRESS CONSOLE           ");
     console.log("==========================================");
@@ -28,25 +30,17 @@ export function afficherMenu() {
     console.log("0. Quitter");
     console.log("==========================================");
 
-    choix = prompt("Votre choix : ");
+    let choix = prompt("Votre choix : ");
 
     switch (choix) {
-        case "1":
-            afficherApprenants();
-            break;
-        case "2":
-            creerApprenant();
-            break;
-        case "3":
-            rechercherParId();
-            break;
-        case "0":
-            console.log("Au revoir !");
-            break;
-            default:
-                console.log("Choix invalide.veuillez ressayer.");
-
-            }
-            }
+      case "1" : afficherApprenants(); break;
+      case "2" : creerApprenant(); break;
+      case "3" : rechercherParId(); break;
+      case "0":
+        console.log("Au revoir !");
+        return; // Quitte la fonction et arrête la boucle
+      default:
+        console.log("Choix invalide. Veuillez réessayer.");
+    }
+  }
  }
-    afficherMenu();

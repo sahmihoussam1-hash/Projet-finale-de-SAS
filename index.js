@@ -4,13 +4,13 @@ import { apprenants } from './data.js'
 // Import du module prompt-sync
 
 const prompt = promptSync();
-// 1
-export function Normalisernom(nom) {
+// 1-n7yde les espaces w normaliser les noms:
+export function Normalisernom(nom) { 
     if (!nom) return "";
-    return nom.trim().toLowerCase();
+    return nom.trim().toLowerCase();   // /\s+/g, " "
 
 }
-
+// 2-Calcule de progression :
 export function calculeProgression(apprenant) {
     let totaleTermines = 0;
     let totaleProposes = 0;
@@ -38,34 +38,45 @@ export function calculeProgression(apprenant) {
 }
 
 
-   // TABLEAU DE BORD
-   export function afficherTableauDeBord () {
-     console.log("\n--- Tableau de bord ---");
-     if (apprenants.length == 0) {
-       console.log("Aucun donnée disponible.");
-       return;
-     }
-     let totalPourcentage = 0;
+//  3-TABLEAU DE BORD:
+// securite  ila kan tableau vide :
+export function afficherTableauDeBord() {
+    console.log("\n--- Tableau de bord ---");
+    if (apprenants.length == 0) {
+        console.log("Aucun donnée disponible.");
+        return;
+    }
+    // initialisation des compteurs :
+    let totalPourcentage = 0;  // accumule la somme de tous pourcentage
     let compteSolide = 0;
     let compteEnProgression = 0;
     let compteARenforcer = 0;
+// boucle pour parcourir les apprenants un par un :
+    for (let i = 0; i < apprenants.length; i++) {
+        let prog = calculeProgression(apprenants[i]); // fait une appel pour le pourcentage et le niveau individuel d apprenant courant
+        totalPourcentage = totalPourcentage + prog.pourcentage; // katzid le pourcentage l'accumule totale
 
-    for (let i=0;i < apprenants.length; i++){
-            let prog = calculeProgression(apprenants[i]);
-        totalPourcentage = totalPourcentage + prog.pourcentage;
+        if (prog.niveau == "solide") compteSolide++; // analyse de les niveaux retourne et incremente lcompteur correspondant
+        else if (prog.niveau == "En progression")
+            compteEnProgression++;
+        else compteARenforcer++;
     }
+    let moyenne = Math.round(totalPourcentage / apprenants.length);
+// afficher l'ensemble calculés f un tableau de bord f terminal:
+    console.log("Nombre totale d'apprenants :" + apprenants.length);
 
-   }
+    console.log("Moyenne générale de progression :" + moyenne + "%");
 
+    console.log("Répartition par niveau :");
 
+    console.log(" - Solide :" + compteSolide);
 
+    console.log(" - En progression :" + compteEnProgression);
 
+    console.log(" - A renforcer :" + compteARenforcer);
+}
 
-
-
-
-
-//  2
+//  4-Afficher Apprenants:
 export function afficherApprenants() {
     console.log("\n---Liste des apprenants---");
 
@@ -77,12 +88,10 @@ export function afficherApprenants() {
         let app = apprenants[i];
         let prog = calculeProgression(app);
 
-        console.log(
-            i + " - " + app.nomComplet + " (" + app.ville + ") : " + prog.pourcentage + "% - " + prog.niveau
-        );
+        console.log(app.id + " - " + app.nomComplet + " (" + app.ville + ") : " + prog.pourcentage + "% - " + prog.niveau);
     }
 }
-//  3 Créer un apprenant (ajouter nomComplet + ville) (id: est auto increment length++)
+//  4-Créer un apprenant (ajouter nomComplet + ville) (id: est auto increment length++):
 export function creerApprenant() {
 
     console.log("\n---Creer un apprenant---");
@@ -107,42 +116,24 @@ export function creerApprenant() {
     console.log("apprenant " + nomComplet + " cree avec succes (ID:" + nouvelId + ")!");
 }
 
-    // 5. Rechercher un apprenant par ID avec .find()
+// 5-n9lbo 3la apprenant b Id dyalo:
 export function rechercherParId() {
- 
+
     console.log("\n--- Rechercher par ID ---");
-  
-  let idSaisi = parseInt(prompt("Entrez l'ID : "));
-  
-  // .find cherche et envoie  l'apprenant avec le bon ID
-  let app = apprenants.find(a => a.id === idSaisi);
 
-  // Si app n'est pas undefined (un apprenant a été trouvé)
-  if (app) {
+    let idSaisi = parseInt(prompt("Entrez l'ID : "));
+    // .find cherche et envoie  l'apprenant avec le bon ID:
+    let app = apprenants.find(a => a.id === idSaisi);
+    // Ila kant app undifined implique resultas trouver:
+    if (app) {
 
-    let prog = calculeProgression(app);
-    console.log("Trouvé: ID " + app.id + " - " + app.nomComplet + " (" + app.ville + ")");
-    console.log("Progression: " + prog.pourcentage + "% [" + prog.niveau + "]");
-  } else {
-    console.log("Aucun apprenant trouvé avec cet ID.");
-  }
+        let prog = calculeProgression(app);
+        console.log("Trouvé: ID " + app.id + " - " + app.nomComplet + " (" + app.ville + ")");
+        console.log("Progression: " + prog.pourcentage + "% [" + prog.niveau + "]");
+    } else {
+        console.log("Aucun apprenant trouvé avec cet ID.");
+    }
 }
- 
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 import { afficherMenu } from './Menu.js';
 
