@@ -108,7 +108,10 @@ function rechercherParId() {
     console.log("\n--- Rechercher par ID ---");
 
     let idSaisi = parseInt(prompt("Entrez l'ID : "));
-
+    if (isNaN(idSaisi)){
+        console.log("Erreur:veuillez entrer un nemuro Id valide.");
+        return;
+    }
     let app = apprenants.find(a => a.id === idSaisi);
 
     if (app) {
