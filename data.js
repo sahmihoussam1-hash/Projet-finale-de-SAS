@@ -11,6 +11,7 @@ export const apprenants = [
             { jour: 2, exercicesTermines: 14, totalExercices: 20, challengeTermine: false }
         ]
     },
+   
     {
         id: 2,
         nomComplet: "Yassine Code",

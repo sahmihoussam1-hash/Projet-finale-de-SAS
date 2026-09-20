@@ -1,141 +1,239 @@
-import promptSync from 'prompt-sync';
-import { apprenants } from './data.js'
+// ==============================================================================
+// 2. FONCTIONS DE SÉCURITÉ ET DE CALCUL (OUTILS INTERNES)
+// ==============================================================================
 
-// Import du module prompt-sync
-
-const prompt = promptSync();
-// 1-n7yde les espaces w normaliser les noms:
-export function Normalisernom(nom) { 
+/**
+ * Nettoie les espaces superflus et met en minuscules.
+ */
+function Normalisernom(nom) {
     if (!nom) return "";
-    return nom.trim().toLowerCase().replace(/\s+/g, " ");   
-
+    return nom.trim().toLowerCase().replace(/\s+/g, " ");
 }
-// 2-Calcule de progression :
-export function calculeProgression(apprenant) {
+
+/**
+ * Valide la cohérence des données saisies pour une journée.
+ */
+function validerResultat(jour, exercicesTermines, totalExercices) {
+    if (isNaN(jour) || jour < 1 || jour > 7) {
+        return { valide: false, message: "Le jour doit être un nombre compris entre 1 et 7." };
+    }
+    if (isNaN(totalExercices) || totalExercices <= 0) {
+        return { valide: false, message: "Le total d'exercices doit être supérieur à 0." };
+    }
+    if (isNaN(exercicesTermines) || exercicesTermines < 0) {
+        return { valide: false, message: "Les exercices terminés ne peuvent pas être négatifs." };
+    }
+    if (exercicesTermines > totalExercices) {
+        return { valide: false, message: `Incohérence : ${exercicesTermines} terminés sur ${totalExercices} proposés !` };
+    }
+    return { valide: true, message: "Ok" };
+}
+
+/**
+ * Calcule le pourcentage global et le niveau d'un apprenant.
+ */
+function calculeProgression(apprenant) {
     let totaleTermines = 0;
     let totaleProposes = 0;
 
     for (let i = 0; i < apprenant.resultats.length; i++) {
-        let journee = apprenant.resultats[i];
-
-        totaleTermines = totaleTermines + journee.exercicesTermines;
-        totaleProposes = totaleProposes + journee.totalExercices;
+        totaleTermines += apprenant.resultats[i].exercicesTermines;
+        totaleProposes += apprenant.resultats[i].totalExercices;
     }
 
-    let pourcentage = 0;
-    if (totaleProposes > 0) {
-        pourcentage = Math.floor((totaleTermines / totaleProposes) * 100);
-    }
+    let pourcentage = totaleProposes > 0 ? Math.floor((totaleTermines / totaleProposes) * 100) : 0;
+
     let niveau = "";
-    if (pourcentage >= 80) {
-        niveau = "solide";
-    } else if (pourcentage >= 50) {
-        niveau = "En progression";
-    } else {
-        niveau = "A renforcer";
-    }
-    return { totaleTermines, totaleProposes, pourcentage, niveau };
+    if (pourcentage >= 80) niveau = "Solide";
+    else if (pourcentage >= 50) niveau = "En progression";
+    else niveau = "À renforcer";
+
+    return { pourcentage, niveau };
 }
 
 
-//  3-TABLEAU DE BORD:
-// securite  ila kan tableau vide :
-export function afficherTableauDeBord() {
-    console.log("\n--- Tableau de bord ---");
-    if (apprenants.length == 0) {
-        console.log("Aucun donnée disponible.");
-        return;
-    }
-    // initialisation des compteurs :
+// ==============================================================================
+// 3. FONCTIONS CORRESPONDANT STRICTEMENT AU CAHIER DES CHARGES DU PROF
+// ==============================================================================
 
-    let totalPourcentage = 0;  // accumule la somme de tous pourcentage
-    let compteSolide = 0;
-    let compteEnProgression = 0;
-    let compteARenforcer = 0;
-// boucle pour parcourir les apprenants un par un :
-
-    for (let i = 0; i < apprenants.length; i++) {
-        let prog = calculeProgression(apprenants[i]); // fait une appel pour le pourcentage et le niveau individuel d apprenant courant
-        totalPourcentage = totalPourcentage + prog.pourcentage; // katzid le pourcentage l'accumule totale
-
-        if (prog.niveau == "solide") compteSolide++; // analyse de les niveaux retourne et incremente lcompteur correspondant
-        else if (prog.niveau == "En progression")
-            compteEnProgression++;
-        else compteARenforcer++;
-    }
-    let moyenne = Math.floor(totalPourcentage / apprenants.length);
-// afficher l'ensemble calculés f un tableau de bord f terminal:
-    console.log("Nombre totale d'apprenants :" + apprenants.length);
-
-    console.log("Moyenne générale de progression :" + moyenne + "%");
-
-    console.log("Répartition par niveau :");
-
-    console.log(" - Solide :" + compteSolide);
-
-    console.log(" - En progression :" + compteEnProgression);
-
-    console.log(" - A renforcer :" + compteARenforcer);
-}
-
-//  4-Afficher Apprenants:
-export function afficherApprenants() {
-    console.log("\n---Liste des apprenants---");
+// --- 1. AFFICHER APPRENANTS ---
+function afficherApprenants() {
+    console.log("\n--- Liste des apprenants ---");
 
     if (apprenants.length == 0) {
-        console.log("Aucun résultat trouvé.");
+        console.log("Aucun apprenant enregistré.");
         return;
     }
+
     for (let i = 0; i < apprenants.length; i++) {
         let app = apprenants[i];
         let prog = calculeProgression(app);
-
-       console.log(`${app.id} - ${app.nomComplet} (${app.ville}) : ${prog.pourcentage}% -${prog.niveau}`);
-    //    - Oumaima (Nador) : 85% - solide
-   //     - Karima (Oujda) : 45% - A renforcer
+        console.log(`ID: ${app.id} | ${app.nomComplet} (${app.ville}) - ${prog.pourcentage}% [${prog.niveau}]`);
     }
 }
-//  4-Créer un apprenant (ajouter nomComplet + ville) (id: est auto increment length++):
+
+// --- 2. CRÉER UN APPRENANT (ID AUTO-INCRÉMENT : length + 1) ---
 export function creerApprenant() {
+  console.log("\n--- Créer Un Apprenant ---");
 
-    console.log("\n---Creer un apprenant---");
+  let nomComplet = prompt("Nom complet : ");
+  let ville = prompt("Ville : ");
 
-    let nomComplet = prompt("nomComplet:");
-    let ville = prompt("ville:");
+  // 1. Vérification (sans le point-virgule après la parenthèse)
+  if (!nomComplet || !ville || !nomComplet.trim() || !ville.trim()) {
+    console.log("Erreur : Le nom et la ville ne peuvent pas être vides.");
+    return;
+  }
 
-    if ( !nomComplet.trim() || !ville.trim() ) {
-        console.log("Erreur: Le nom et la ville ne peuvent pas etre vide:");
-        return;
-    }
+  // 2. Récupération du dernier ID pour auto-incrémentation
+  let dernierApprenant = apprenants[apprenants.length - 1];
+  let nouvelId = dernierApprenant ? dernierApprenant.id + 1 : 1;
 
-    let nouvelId = apprenants.length + 1;
+  // 3. Création de l'objet (clés en minuscules pour être cohérent avec le reste)
+  let nouvelApprenant = {
+    id: nouvelId,
+    nomComplet: Normalisernom(nomComplet),
+    ville: ville.trim(),
+    resultats: []
+  };
 
-    apprenants.push({
-        id: nouvelId,
-        nomComplet: nomComplet.trim(),
-        ville: ville.trim(),
-        resultats: [],
-    });
-
-    console.log("apprenant " + nomComplet + " cree avec succes (ID:" + nouvelId + ")!");
+  // 4. Ajout dans le tableau principal
+  apprenants.push(nouvelApprenant);
+  console.log(`Apprenant ${nouvelApprenant.nomComplet} créé avec succès (ID : ${nouvelId}) !`);
 }
+    
 
-// 5-n9lbo 3la apprenant b Id dyalo:
-export function rechercherParId() {
-
+// --- 3. RECHERCHER UN APPRENANT PAR ID (Utilisation de .find()) ---
+function rechercherParId() {
     console.log("\n--- Rechercher par ID ---");
 
     let idSaisi = parseInt(prompt("Entrez l'ID : "));
-    // .find cherche et envoie  l'apprenant avec le bon ID:
-    let app = apprenants.find(a => a.id === idSaisi); 
-    // Ila kant app undifined implique resultas trouver:
-    if (app) {
 
+    let app = apprenants.find(a => a.id === idSaisi);
+
+    if (app) {
         let prog = calculeProgression(app);
-        console.log("Trouvé: ID " + app.id + " - " + app.nomComplet + " (" + app.ville + ")");
-        console.log("Progression: " + prog.pourcentage + "% [" + prog.niveau + "]");
+        console.log(`\nTrouvé : ID ${app.id} - ${app.nomComplet} (${app.ville})`);
+        console.log(`Progression : ${prog.pourcentage}% | Niveau : ${prog.niveau}`);
     } else {
         console.log("Aucun apprenant trouvé avec cet ID.");
     }
-}   
+}
 
+// --- 4. RECHERCHER UN APPRENANT PAR NOM (Utilisation de Normalisernom & .filter()) ---
+function rechercherParNom() {
+    console.log("\n--- Rechercher par Nom ---");
+
+    let recherche = prompt("Entrez le nom (ou partie du nom) : ");
+    let recherchePropre = Normalisernom(recherche);
+
+    if (!recherchePropre) {
+        console.log("Erreur : La recherche ne peut pas être vide.");
+        return;
+    }
+
+    let resultats = apprenants.filter(a => Normalisernom(a.nomComplet).includes(recherchePropre));
+
+    if (resultats.length === 0) {
+        console.log("Aucun résultat trouvé.");
+    } else {
+        console.log(`\n${resultats.length} résultat(s) trouvé(s) :`);
+        resultats.forEach(app => {
+            let prog = calculeProgression(app);
+            console.log(`- ID ${app.id} : ${app.nomComplet} (${app.ville}) | ${prog.pourcentage}% [${prog.niveau}]`);
+        });
+    }
+}
+
+// --- 5. TRIER LES APPRENANTS PAR ORDRE ALPHABÉTIQUE (Utilisation de .sort()) ---
+function trierParAlphabetique() {
+    console.log("\n--- Liste triée par Ordre Alphabétique ---");
+
+    let listeTriee = [...apprenants].sort((a, b) => a.nomComplet.localeCompare(b.nomComplet));
+
+    listeTriee.forEach(app => {
+        let prog = calculeProgression(app);
+        console.log(`- ${app.nomComplet} (${app.ville}) : ${prog.pourcentage}% [${prog.niveau}]`);
+    });
+}
+
+// --- 6. AJOUTER LE RÉSULTAT DE LA JOURNÉE (Avec validerResultat) ---
+function ajouterResultatJournee() {
+    console.log("\n--- Ajouter résultat de la journée ---");
+
+    let idSaisi = parseInt(prompt("ID de l'apprenant : "));
+    let app = apprenants.find(a => a.id === idSaisi);
+
+    if (!app) {
+        console.log("Erreur : Aucun apprenant trouvé avec cet ID.");
+        return;
+    }
+
+    let jour = parseInt(prompt("Numéro du jour (1-7) : "));
+    let exercicesTermines = parseInt(prompt("Exercices terminés : "));
+    let totalExercices = parseInt(prompt("Total exercices proposés : "));
+
+    // Contrôle avec la fonction de validation
+    let validation = validerResultat(jour, exercicesTermines, totalExercices);
+    if (!validation.valide) {
+        console.log(`Erreur : ${validation.message}`);
+        return;
+    }
+
+    let challengeReponse = prompt("Challenge réussi ? (oui/non) : ").toLowerCase().trim();
+    let challengeTermine = (challengeReponse === "oui" || challengeReponse === "o");
+
+    // Ajout du résultat
+    app.resultats.push({
+        jour,
+        exercicesTermines,
+        totalExercices,
+        challengeTermine
+    });
+
+    let prog = calculeProgression(app);
+    console.log(`\nSuccès ! Journée enregistrée pour ${app.nomComplet}. Nouvelle progression : ${prog.pourcentage}%.`);
+}
+
+// --- 7. AFFICHER LES STATISTIQUES (Total apprenants & Total par niveau) ---
+function afficherStatistiques() {
+    console.log("\n==========================================");
+    console.log("               STATISTIQUES               ");
+    console.log("==========================================");
+
+    console.log(`Total des apprenants : ${apprenants.length}`);
+
+    if (apprenants.length === 0) return;
+
+    let solide = 0;
+    let enProgression = 0;
+    let aRenforcer = 0;
+
+    apprenants.forEach(app => {
+        let prog = calculeProgression(app);
+        if (prog.niveau === "Solide") solide++;
+        else if (prog.niveau === "En progression") enProgression++;
+        else aRenforcer++;
+    });
+
+    console.log("\nTotal des apprenants par niveau :");
+    console.log(` - Solide (>= 80%)       : ${solide}`);
+    console.log(` - En progression (50-79%): ${enProgression}`);
+    console.log(` - À renforcer (< 50%)    : ${aRenforcer}`);
+}
+
+// --- 8. TRI DES APPRENANTS PAR NIVEAU / PROGRESSION (Utilisation de .sort()) ---
+function trierParNiveau() {
+    console.log("\n--- Tri des apprenants par niveau (Progression) ---");
+
+    let listeTriee = [...apprenants].sort((a, b) => {
+        let progA = calculeProgression(a).pourcentage;
+        let progB = calculeProgression(b).pourcentage;
+        return progB - progA;
+    });
+
+    listeTriee.forEach((app, index) => {
+        let prog = calculeProgression(app);
+        console.log(`${index + 1}. ${app.nomComplet} : ${prog.pourcentage}% [${prog.niveau}]`);
+    });
+} 
