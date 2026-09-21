@@ -1,25 +1,23 @@
+// 1. IMPORTS
 import promptSync from 'prompt-sync';
-
-
-const prompt = promptSync();
-
 import {
-  afficherTableauDeBord,
   afficherApprenants,
   creerApprenant,
-  rechercherParId
-  ajouterModifierResultat,
+  rechercherParId,
   rechercherParNom,
-  filtrerParNiveau,
-  trierParProgression,
-  trierParNom
+  trierParAlphabetique,
+  ajouterResultatJournee,
+  afficherStatistiques,
+  trierParNiveau
 } from './index.js';
 
+// 2. INITIALISATION DE PROMPT (OBLIGATOIREMENT ICI, AVANT LA FONCTION !)
+const prompt = promptSync();
 
-
+// 3. FONCTION PRINCIPALE
 export function afficherMenu() {
-    
-   let continuer = true;
+  const prompt = promptSync();
+    let continuer = true;
 
     while (continuer) {
         console.log("\n==========================================");
@@ -29,16 +27,16 @@ export function afficherMenu() {
         console.log("2. Créer un apprenant");
         console.log("3. Rechercher un apprenant par ID");
         console.log("4. Rechercher un apprenant par nom");
-        console.log("5. Trier les apprenants par ordre alphabétique");
-        console.log("------------------------------------------");
-        console.log("6. Ajouter le résultat de la journée");
-        console.log("7. Afficher les statistiques globales");
-        console.log("8. Trier les apprenants par niveau");
-        console.log("------------------------------------------");
+        console.log("5. Trier par ordre alphabétique");
+        console.log("6. Ajouter le résultat d'une journée");
+        console.log("7. Afficher les statistiques");
+        console.log("8. Trier par niveau / progression");
         console.log("0. Quitter");
         console.log("==========================================");
 
-        let choix = prompt("Votre choix : ").trim();
+        // Récupération sécurisée du choix (le ?.trim() évite les plantages si la saisie est null)
+        let saisie = prompt("Votre choix : ");
+        let choix = saisie ? saisie.trim() : "";
 
         switch (choix) {
             case "1":
@@ -74,6 +72,3 @@ export function afficherMenu() {
         }
     }
 }
-
-// Lancement du programme
-lancerMenu();

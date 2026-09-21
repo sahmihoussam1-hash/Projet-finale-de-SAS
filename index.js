@@ -1,3 +1,10 @@
+import promptSync from 'prompt-sync';
+import { apprenants } from './data.js'
+import { afficherMenu } from './Menu.js';
+// Import du module prompt-sync
+
+const prompt = promptSync();
+
 // ==============================================================================
 // 2. FONCTIONS DE SÉCURITÉ ET DE CALCUL (OUTILS INTERNES)
 // ==============================================================================
@@ -5,7 +12,7 @@
 /**
  * Nettoie les espaces superflus et met en minuscules.
  */
-function Normalisernom(nom) {
+export function Normalisernom(nom) {
     if (!nom) return "";
     return nom.trim().toLowerCase().replace(/\s+/g, " ");
 }
@@ -13,7 +20,7 @@ function Normalisernom(nom) {
 /**
  * Valide la cohérence des données saisies pour une journée.
  */
-function validerResultat(jour, exercicesTermines, totalExercices) {
+export function validerResultat(jour, exercicesTermines, totalExercices) {
     if (isNaN(jour) || jour < 1 || jour > 7) {
         return { valide: false, message: "Le jour doit être un nombre compris entre 1 et 7." };
     }
@@ -32,7 +39,7 @@ function validerResultat(jour, exercicesTermines, totalExercices) {
 /**
  * Calcule le pourcentage global et le niveau d'un apprenant.
  */
-function calculeProgression(apprenant) {
+export function calculeProgression(apprenant) {
     let totaleTermines = 0;
     let totaleProposes = 0;
 
@@ -57,10 +64,10 @@ function calculeProgression(apprenant) {
 // ==============================================================================
 
 // --- 1. AFFICHER APPRENANTS ---
-function afficherApprenants() {
+export function afficherApprenants() {
     console.log("\n--- Liste des apprenants ---");
 
-    if (apprenants.length == 0) {
+    if (apprenants.length === 0) {
         console.log("Aucun apprenant enregistré.");
         return;
     }
@@ -104,12 +111,12 @@ export function creerApprenant() {
     
 
 // --- 3. RECHERCHER UN APPRENANT PAR ID (Utilisation de .find()) ---
-function rechercherParId() {
+export function rechercherParId() {
     console.log("\n--- Rechercher par ID ---");
 
     let idSaisi = parseInt(prompt("Entrez l'ID : "));
     if (isNaN(idSaisi)){
-        console.log("Erreur:veuillez entrer un nemuro Id valide.");
+        console.log("Erreur:veuillez entrer un numéro ID valide.");
         return;
     }
     let app = apprenants.find(a => a.id === idSaisi);
@@ -124,7 +131,8 @@ function rechercherParId() {
 }
 
 // --- 4. RECHERCHER UN APPRENANT PAR NOM (Utilisation de Normalisernom & .filter()) ---
-function rechercherParNom() {
+export function rechercherParNom() {
+
     console.log("\n--- Rechercher par Nom ---");
 
     let recherche = prompt("Entrez le nom (ou partie du nom) : ");
@@ -149,7 +157,7 @@ function rechercherParNom() {
 }
 
 // --- 5. TRIER LES APPRENANTS PAR ORDRE ALPHABÉTIQUE (Utilisation de .sort()) ---
-function trierParAlphabetique() {
+export function trierParAlphabetique() {
     console.log("\n--- Liste triée par Ordre Alphabétique ---");
 
     let listeTriee = [...apprenants].sort((a, b) => a.nomComplet.localeCompare(b.nomComplet));
@@ -161,7 +169,7 @@ function trierParAlphabetique() {
 }
 
 // --- 6. AJOUTER LE RÉSULTAT DE LA JOURNÉE (Avec validerResultat) ---
-function ajouterResultatJournee() {
+export function ajouterResultatJournee() {
     console.log("\n--- Ajouter résultat de la journée ---");
 
     let idSaisi = parseInt(prompt("ID de l'apprenant : "));
@@ -199,7 +207,7 @@ function ajouterResultatJournee() {
 }
 
 // --- 7. AFFICHER LES STATISTIQUES (Total apprenants & Total par niveau) ---
-function afficherStatistiques() {
+export function afficherStatistiques() {
     console.log("\n==========================================");
     console.log("               STATISTIQUES               ");
     console.log("==========================================");
@@ -226,7 +234,7 @@ function afficherStatistiques() {
 }
 
 // --- 8. TRI DES APPRENANTS PAR NIVEAU / PROGRESSION (Utilisation de .sort()) ---
-function trierParNiveau() {
+export function trierParNiveau() {
     console.log("\n--- Tri des apprenants par niveau (Progression) ---");
 
     let listeTriee = [...apprenants].sort((a, b) => {
@@ -240,3 +248,4 @@ function trierParNiveau() {
         console.log(`${index + 1}. ${app.nomComplet} : ${prog.pourcentage}% [${prog.niveau}]`);
     });
 } 
+afficherMenu();
