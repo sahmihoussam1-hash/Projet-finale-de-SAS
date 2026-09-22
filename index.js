@@ -5,21 +5,17 @@ import { afficherMenu } from './Menu.js';
 
 const prompt = promptSync();
 
-// ==============================================================================
-// 2. FONCTIONS DE SÉCURITÉ ET DE CALCUL (OUTILS INTERNES)
-// ==============================================================================
 
-/**
- * Nettoie les espaces superflus et met en minuscules.
- */
+
+ 
 export function Normalisernom(nom) {
     if (!nom) return "";
     return nom.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-/**
- * Valide la cohérence des données saisies pour une journée.
- */
+/
+//  la cohérence des données
+ 
 export function validerResultat(jour, exercicesTermines, totalExercices) {
     if (isNaN(jour) || jour < 1 || jour > 7) {
         return { valide: false, message: "Le jour doit être un nombre compris entre 1 et 7." };
@@ -36,9 +32,9 @@ export function validerResultat(jour, exercicesTermines, totalExercices) {
     return { valide: true, message: "Ok" };
 }
 
-/**
- * Calcule le pourcentage global et le niveau d'un apprenant.
- */
+
+ 
+ 
 export function calculeProgression(apprenant) {
     let totaleTermines = 0;
     let totaleProposes = 0;
@@ -53,17 +49,12 @@ export function calculeProgression(apprenant) {
     let niveau = "";
     if (pourcentage >= 80) niveau = "Solide";
     else if (pourcentage >= 50) niveau = "En progression";
-    else niveau = "À renforcer";
+    else niveau = "À renforcer"; 
 
     return { pourcentage, niveau };
 }
+   
 
-
-// ==============================================================================
-// 3. FONCTIONS CORRESPONDANT STRICTEMENT AU CAHIER DES CHARGES DU PROF
-// ==============================================================================
-
-// --- 1. AFFICHER APPRENANTS ---
 export function afficherApprenants() {
     console.log("\n--- Liste des apprenants ---");
 
@@ -79,24 +70,23 @@ export function afficherApprenants() {
     }
 }
 
-// --- 2. CRÉER UN APPRENANT (ID AUTO-INCRÉMENT : length + 1) ---
 export function creerApprenant() {
   console.log("\n--- Créer Un Apprenant ---");
 
   let nomComplet = prompt("Nom complet : ");
   let ville = prompt("Ville : ");
 
-  // 1. Vérification (sans le point-virgule après la parenthèse)
+  
   if (!nomComplet || !ville || !nomComplet.trim() || !ville.trim()) {
     console.log("Erreur : Le nom et la ville ne peuvent pas être vides.");
     return;
   }
 
-  // 2. Récupération du dernier ID pour auto-incrémentation
+  
   let dernierApprenant = apprenants[apprenants.length - 1];
   let nouvelId = dernierApprenant ? dernierApprenant.id + 1 : 1;
 
-  // 3. Création de l'objet (clés en minuscules pour être cohérent avec le reste)
+ 
   let nouvelApprenant = {
     id: nouvelId,
     nomComplet: Normalisernom(nomComplet),
@@ -104,13 +94,13 @@ export function creerApprenant() {
     resultats: []
   };
 
-  // 4. Ajout dans le tableau principal
+  
   apprenants.push(nouvelApprenant);
   console.log(`Apprenant ${nouvelApprenant.nomComplet} créé avec succès (ID : ${nouvelId}) !`);
 }
     
 
-// --- 3. RECHERCHER UN APPRENANT PAR ID (Utilisation de .find()) ---
+
 export function rechercherParId() {
     console.log("\n--- Rechercher par ID ---");
 
@@ -130,7 +120,7 @@ export function rechercherParId() {
     }
 }
 
-// --- 4. RECHERCHER UN APPRENANT PAR NOM (Utilisation de Normalisernom & .filter()) ---
+
 export function rechercherParNom() {
 
     console.log("\n--- Rechercher par Nom ---");
@@ -156,7 +146,7 @@ export function rechercherParNom() {
     }
 }
 
-// --- 5. TRIER LES APPRENANTS PAR ORDRE ALPHABÉTIQUE (Utilisation de .sort()) ---
+
 export function trierParAlphabetique() {
     console.log("\n--- Liste triée par Ordre Alphabétique ---");
 
@@ -168,7 +158,7 @@ export function trierParAlphabetique() {
     });
 }
 
-// --- 6. AJOUTER LE RÉSULTAT DE LA JOURNÉE (Avec validerResultat) ---
+
 export function ajouterResultatJournee() {
     console.log("\n--- Ajouter résultat de la journée ---");
 
@@ -184,7 +174,7 @@ export function ajouterResultatJournee() {
     let exercicesTermines = parseInt(prompt("Exercices terminés : "));
     let totalExercices = parseInt(prompt("Total exercices proposés : "));
 
-    // Contrôle avec la fonction de validation
+   
     let validation = validerResultat(jour, exercicesTermines, totalExercices);
     if (!validation.valide) {
         console.log(`Erreur : ${validation.message}`);
@@ -194,7 +184,7 @@ export function ajouterResultatJournee() {
     let challengeReponse = prompt("Challenge réussi ? (oui/non) : ").toLowerCase().trim();
     let challengeTermine = (challengeReponse === "oui" || challengeReponse === "o");
 
-    // Ajout du résultat
+   
     app.resultats.push({
         jour,
         exercicesTermines,
@@ -206,7 +196,6 @@ export function ajouterResultatJournee() {
     console.log(`\nSuccès ! Journée enregistrée pour ${app.nomComplet}. Nouvelle progression : ${prog.pourcentage}%.`);
 }
 
-// --- 7. AFFICHER LES STATISTIQUES (Total apprenants & Total par niveau) ---
 export function afficherStatistiques() {
     console.log("\n==========================================");
     console.log("               STATISTIQUES               ");
@@ -233,7 +222,7 @@ export function afficherStatistiques() {
     console.log(` - À renforcer (< 50%)    : ${aRenforcer}`);
 }
 
-// --- 8. TRI DES APPRENANTS PAR NIVEAU / PROGRESSION (Utilisation de .sort()) ---
+
 export function trierParNiveau() {
     console.log("\n--- Tri des apprenants par niveau (Progression) ---");
 
@@ -248,4 +237,4 @@ export function trierParNiveau() {
         console.log(`${index + 1}. ${app.nomComplet} : ${prog.pourcentage}% [${prog.niveau}]`);
     });
 } 
-afficherMenu();
+afficherMenu()
