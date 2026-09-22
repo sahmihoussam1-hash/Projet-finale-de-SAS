@@ -13,7 +13,7 @@ export function Normalisernom(nom) {
     return nom.trim().toLowerCase().replace(/\s+/g, " ");
 }
 
-/
+
 //  la cohérence des données
  
 export function validerResultat(jour, exercicesTermines, totalExercices) {
